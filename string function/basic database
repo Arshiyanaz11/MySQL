@@ -1,0 +1,167 @@
+use filtering_database;
+create table cust_info_2 ( 
+    customersid int auto_increment primary key, 
+    firstnames varchar(50), 
+    lastnames varchar(50), 
+    address varchar(255), 
+    spending decimal(10, 2) 
+); 
+
+insert into cust_info_2 (firstnames, lastnames, address, spending) values 
+('John', 'Doe', '123 Main St', 100.50), 
+('Alice', 'Smith', '456 Elm St', 200.75), 
+('Bob', 'Johnson', '789 Oak St', 150.25), 
+('Emily', 'Brown', '321 Pine St', 75.00), 
+('Michael', 'Davis', '654 Maple St', 300.00), 
+('Sarah', 'Wilson', '987 Cedar St', 50.50), 
+('David', 'Lee', '741 Birch St', 180.25), 
+('Jessica', 'Taylor', '852 Walnut St', 220.75), 
+('Chris', 'Evans', '369 Spruce St', 125.00), 
+('Emma', 'Thompson', '159 Fir St', 350.25); 
+
+select * from cust_info_2
+-- Write necessary code to add the FirstNames and LastNames into a new column NewCustomersNames. --
+
+select concat(firstnames, ' ', lastnames) as newcustomersnames from cust_info_2;
+
+-- upper,lower,trim , replace
+
+
+
+select upper(firstnames) from cust_info_2;
+select lower (lastnames) from cust_info_2;
+select trim(address) from cust_info_2;
+select replace(address, 'St', 'Street') from cust_info_2;
+
+-- max,sum,div,avg,abs,count,min
+
+
+select 
+    max(spending) as max_spending,        
+    min(spending) as min_spending,        
+    sum(spending) as total_spending,      
+    avg(spending) as avg_spending,        
+    count(*) as total_customers,     
+    abs(sum(spending)) as absolute_sum,
+    sum(spending) / count(*) as avg_spending_manual
+from cust_info_2;
+-- Query practice 21 feb
+-- power
+select spending, power(spending, 2) as squared_spending  
+from cust_info_2;
+
+##table 2
+create table exam_info ( 
+    studentid int auto_increment primary key, 
+    firstnames varchar(50), 
+    lastnames varchar(50), 
+    scores int 
+); 
+
+insert into exam_info (firstnames, lastnames, scores) values 
+('john', 'doe',  80), 
+('alice', 'smith',  75), 
+('bob', 'johnson',  78), 
+('emily', 'brown',  60), 
+('michael', 'davis', 86), 
+('sarah', 'wilson', 90), 
+('david', 'lee', 75), 
+('jessica', 'taylor', 75), 
+('chris', 'evans',  55), 
+('emma', 'thompson',  67);
+
+-- Write necessary code to calculate the cube of the Scores column. Store the output in CubeScores. 
+
+alter table exam_info add column cubescores int;
+update exam_info  
+set cubescores = power(scores, 3)  
+where studentid > 0;
+
+select * from exam_info;
+
+-- round 
+select studentid, firstnames, lastnames, scores, round(power(scores, 3)) as roundscore  
+from exam_info;
+
+##table 3
+create table exam_info_2 ( 
+    studentid int auto_increment primary key, 
+    firstnames varchar(50), 
+    lastnames varchar(50), 
+    scores float 
+); 
+
+insert into exam_info_2 (firstnames, lastnames, scores) values 
+('john', 'doe',  80.345544), 
+('alice', 'smith',  75.6355), 
+('bob', 'johnson',  78.5364565), 
+('emily', 'brown',  60.3565), 
+('michael', 'davis', 86.5353656), 
+('sarah', 'wilson', 90.535464), 
+('david', 'lee', 75.567765), 
+('jessica', 'taylor', 75.34242), 
+('chris', 'evans',  55.09098), 
+('emma', 'thompson',  67.34535); 
+
+-- Write necessary code to round up the values of Scores column up to 2 decimal points. Store the output in RoundedScores. 
+
+select round(scores, 2) as roundedscores  
+from exam_info_2;
+-- sqrt , log
+select scores, sqrt(scores), log(scores) from exam_info_2;
+
+-- Write necessary code to transform the values of Scores into square root format. Store the output in TransformedScores. 
+
+select *, sqrt(scores) as transformedscores from exam_info_2;
+-- date format
+
+select date_format(today , '%d-%m-%Y') from exam_info_2;
+select * from exam_info_2
+
+##table 4
+
+create table purchases ( 
+   customerid int, 
+   purchasedate date, 
+   returndate date 
+); 
+
+insert into purchases (customerid, purchasedate, returndate) values 
+(1, '2024-01-01', '2024-01-05'), 
+(2, '2024-01-02', '2024-01-06'), 
+(3, '2024-01-03', '2024-01-07'), 
+(4, '2024-01-04', '2024-01-08'), 
+(5, '2024-01-05', '2024-01-09'), 
+(6, '2024-01-06', '2024-01-10'), 
+(7, '2024-01-07', '2024-01-11'), 
+(8, '2024-01-08', '2024-01-12'), 
+(9, '2024-01-09', '2024-01-13'), 
+(10, '2024-01-10', '2024-01-14'); 
+
+-- Write necessary code to format the dates in PurchaseDate column like this "24-January-1st". Store the output in FormatedDate. 
+select 
+    customerid, 
+    purchasedate, 
+    date_format(purchasedate, '%y-%M-%D') as formateddate 
+from purchases;
+-- datedif
+select purchasedate, date_format(purchasedate, '%y-%M-%D') as formateddate from purchases;
+-- Write necessary code to find the difference between PurchaseDate and ReturnDate columns. Store the output in DateDifference. 
+
+select customerid, purchasedate, returndate, 
+       datediff(returndate, purchasedate) as datedifference 
+from purchases;
+-- date-month-year
+select customerid, purchasedate, day(purchasedate) as day_extracted from purchases;
+
+select customerid, purchasedate, month(purchasedate) as month_extracted from purchases;
+
+select customerid, purchasedate, year(purchasedate) as year_extracted from purchases;
+-- Write necessary code to extract the years from the column ReturnDate. Store the output in YearsData. 
+select year(returndate) as yearsdata from purchases;
+
+-- order
+select * from purchases order by purchasedate asc;
+
+
+
