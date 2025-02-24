@@ -1,0 +1,241 @@
+  1.  ORDER BY
+	2.	GROUP BY
+	3.	INNER JOIN
+	4.	LEFT JOIN
+	5.	RIGHT JOIN
+	6.	CROSS JOIN
+	7.	HAVING
+	8.	EXISTS
+	9.	ANY
+	10.	CASE
+	11.	COMMENT
+	12.	PROCEDURE
+###################
+
+-- create the student_info3 table
+create table student_info3 ( 
+    studentid int primary key, 
+    firstnames varchar(50), 
+    lastnames varchar(50) 
+); 
+
+-- insert 10 values into student_info3 table
+insert into student_info3 (studentid, firstnames, lastnames) values 
+(1, 'John', 'Doe'), 
+(2, 'Alice', 'Smith'), 
+(3, 'Bob', 'Johnson'), 
+(4, 'Emily', 'Brown'), 
+(5, 'Michael', 'Davis'), 
+(6, 'Sarah', 'Wilson'), 
+(7, 'David', 'Lee'), 
+(8, 'Jessica', 'Taylor'), 
+(9, 'Chris', 'Evans'), 
+(10, 'Emma', 'Thompson'); 
+
+-- create the exam_info3 table
+create table exam_info3 ( 
+    studentid int primary key, 
+    subjects varchar(50), 
+    scores int 
+); 
+
+-- insert 10 values into exam_info3 table
+insert into exam_info3 (studentid, subjects, scores) values 
+(1, 'Math',  80), 
+(2, 'English',  75), 
+(3, 'Science',  78), 
+(4, 'Math',  60), 
+(5, 'English', 86), 
+(6, 'Science', 90), 
+(7, 'Science', 75), 
+(8, 'English', 75), 
+(9, 'Math',  55), 
+(10, 'Math',  67); 
+
+-- query to find students who scored more than 75
+select si.*
+from student_info3 si
+join exam_info3 ei on si.studentid = ei.studentid
+where ei.scores > 75;
+
+-- any
+select si.*, ei.scores 
+from student_info3 si
+join exam_info3 ei 
+on si.studentid = any (select studentid from exam_info3 where scores > 75);
+-- case
+ select studentid, subjects, scores,
+    case 
+        when scores >= 85 then 'merit'
+        when scores >= 60 then 'pass'
+        else 'fail'
+    end as grade_category
+from exam_info3;
+#############################################
+
+-- Create customers table
+
+use filtering_database;
+
+create table customers (
+    customerid int primary key, 
+    customername varchar(255)
+);
+
+-- Create orders table
+create table orders (
+    orderid int primary key, 
+    customerid int, 
+    orderamount decimal(10,2), 
+    foreign key (customerid) references customers(customerid)
+);
+
+-- Insert data into customers
+insert into customers values 
+(1, 'alice'), 
+(2, 'bob'), 
+(3, 'charlie'), 
+(4, 'david');
+
+-- Insert data into orders
+insert into orders values 
+(101, 1, 250.50), 
+(102, 2, 100.00), 
+(103, 1, 300.75), 
+(104, 3, 150.25);
+
+-- View customers
+select * from customers;
+
+-- View orders
+select * from orders;
+
+-- Order customers by name
+select * from customers order by customername;
+
+-- Group orders by customer and filter with HAVING
+select customerid, sum(orderamount) as total_spent 
+from orders 
+group by customerid 
+having sum(orderamount) > 200;
+
+-- INNER JOIN customers and orders
+select c.customerid, c.customername, o.orderid 
+from customers c 
+inner join orders o on c.customerid = o.customerid;
+
+-- LEFT JOIN customers and orders
+select c.customerid, c.customername, o.orderid 
+from customers c 
+left join orders o on c.customerid = o.customerid;
+
+-- RIGHT JOIN customers and orders
+select c.customerid, c.customername, o.orderid 
+from customers c 
+right join orders o on c.customerid = o.customerid;
+
+-- CROSS JOIN 
+select * from customers cross join orders;
+
+-- FULL OUTER JOIN
+select c.customerid, c.customername, o.orderid, o.orderamount 
+from customers c 
+left join orders o on c.customerid = o.customerid
+union
+select c.customerid, c.customername, o.orderid, o.orderamount 
+from customers c 
+right join orders o on c.customerid = o.customerid;
+
+-- EXISTS 
+select customerid, customername 
+from customers 
+where exists (
+    select 1 from orders where orders.customerid = customers.customerid
+);
+
+-- having 
+select customerid, sum(orderamount) as total_spent 
+from orders 
+group by customerid 
+having sum(orderamount) > 200;
+
+-- any
+select * 
+from customers 
+where customerid = any (
+    select customerid 
+    from orders 
+    where orderamount > 100);
+    
+
+########################################
+create table students (
+    StudentID integer primary key,
+    StudentNames varchar(255),
+    Age float
+);
+
+create table courses (
+    CourseID integer primary key,
+    CourseName varchar(255),
+    StudentID integer
+);
+
+alter table courses  
+add constraint fk_student_id foreign key (StudentID) references students (StudentID);
+
+insert into students (StudentID, StudentNames, Age) values 
+(1, 'Alex', 18.43),
+(2, 'Akash', 27.56),
+(3, 'Ramisha', 21.45);
+
+insert into courses (CourseID, CourseName, StudentID) values 
+(101, 'Mathematics', 1),
+(102, 'Physics', 2),
+(103, 'Computer Science', 3);
+
+select * from students;
+select * from courses;
+
+
+/* The necessary SQL code
+Selecting students information who got Grade A */
+SELECT *
+FROM student_information
+WHERE `Student ID` = ANY(SELECT `Student ID` FROM enrollments_data WHERE Grade = "A");
+
+USE Sample_Schema;
+
+-- SQL code for deriving students exam outcome
+SELECT *,
+CASE
+ WHEN GPA > 3 THEN 'PASSED'
+ WHEN GPA BETWEEN 2.5 AND 3 THEN 'HOLD'
+ ELSE 'FAILED'
+END AS Outcome
+FROM `student_information (udanous)`;
+
+DELIMITER //
+
+CREATE PROCEDURE student_outcomes()
+  BEGIN
+    SELECT *,
+      CASE
+        WHEN GPA > 3 THEN 'PASSED'
+        WHEN GPA BETWEEN 2.5 AND 3 THEN 'HOLD'
+	  ELSE 'FAILED'
+	END AS Outcome
+    FROM `student_information (udanous)`;
+END//
+
+DELIMITER ; 
+
+CALL student_outcomes()
+
+
+
+
+
+
+
+
